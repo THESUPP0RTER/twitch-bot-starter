@@ -1,0 +1,38 @@
+{
+  "name": "twitch-bot-starter",
+  "version": "1.0.0",
+  "description": "```\r twitch-sentiment-bot/\r ├── src/\r │   ├── bot.ts                # Core bot functionality with Twitch connection\r │   ├── analytics.ts          # Sentiment analysis engine\r │   ├── database.ts           # Database abstraction layer\r │   ├── commands.ts           # Command handling system\r │   ├── api.ts                # REST API for external access\r │   ├── config.ts             # Configuration management\r │   └── utils/\r │       ├── logger.ts         # Logging utility\r │       └── queue.ts          # Message queue for high-volume processing\r ├── data/                     # Database and other persistent data\r ├── public/                   # Static files for web dashboard\r │   ├── index.html            # Dashboard entry point\r │   ├── css/                  # Stylesheets\r │   ├── js/                   # Client-side JavaScript\r │   └── components/           # UI components\r ├── tests/                    # Unit and integration tests\r │   ├── bot.test.ts\r │   ├── analytics.test.ts\r │   └── api.test.ts\r ├── config.json               # Main configuration file\r ├── .env                      # Environment variables (credentials)\r ├── package.json              # Project dependencies\r ├── tsconfig.json             # TypeScript configuration\r └── index.ts                  # Application entry point\r ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/THESUPP0RTER/twitch-bot-starter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/THESUPP0RTER/twitch-bot-starter/issues"
+  },
+  "homepage": "https://github.com/THESUPP0RTER/twitch-bot-starter#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "tmi.js": "^1.8.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.14.0",
+    "@types/tmi.js": "^1.8.6",
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
+    "eslint": "^9.23.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.2"
+  }
+}
