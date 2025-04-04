@@ -4,6 +4,8 @@
   "description": "```\r twitch-sentiment-bot/\r ├── src/\r │   ├── bot.ts                # Core bot functionality with Twitch connection\r │   ├── analytics.ts          # Sentiment analysis engine\r │   ├── database.ts           # Database abstraction layer\r │   ├── commands.ts           # Command handling system\r │   ├── api.ts                # REST API for external access\r │   ├── config.ts             # Configuration management\r │   └── utils/\r │       ├── logger.ts         # Logging utility\r │       └── queue.ts          # Message queue for high-volume processing\r ├── data/                     # Database and other persistent data\r ├── public/                   # Static files for web dashboard\r │   ├── index.html            # Dashboard entry point\r │   ├── css/                  # Stylesheets\r │   ├── js/                   # Client-side JavaScript\r │   └── components/           # UI components\r ├── tests/                    # Unit and integration tests\r │   ├── bot.test.ts\r │   ├── analytics.test.ts\r │   └── api.test.ts\r ├── config.json               # Main configuration file\r ├── .env                      # Environment variables (credentials)\r ├── package.json              # Project dependencies\r ├── tsconfig.json             # TypeScript configuration\r └── index.ts                  # Application entry point\r ```",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

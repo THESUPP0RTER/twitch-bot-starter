@@ -1,7 +1,5 @@
-
-const winston = require("winston")
-
-
+"use strict";
+const winston = require("winston");
 const levels = {
     error: 0,
     warn: 1,
@@ -11,7 +9,6 @@ const levels = {
     debug: 5,
     silly: 6
 };
-
 const logger = winston.createLogger({
     level: levels,
     format: winston.format.json(),
@@ -29,7 +26,6 @@ const logger = winston.createLogger({
         new winston.transports.File({ filename: 'combined.log' }),
     ]
 });
-
 //
 // If we're not in production then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
@@ -39,8 +35,6 @@ if (process.env.NODE_ENV !== 'production') {
         format: winston.format.simple(),
     }));
 }
-
-
 //logger.stream = {
 //   write: (message) => {
 //        console.log(message)

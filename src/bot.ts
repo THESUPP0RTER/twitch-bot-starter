@@ -2,8 +2,10 @@ import * as tmi from 'tmi.js'
 import { CommandHandler } from './commands';
 
 export interface BotOptions {
-    username: string;
-    password: string;
+    identity: {
+        username: string;
+        password: string;
+    };
     channels: string[];
     debug?: boolean;
     commandPrefix?: string;
@@ -26,12 +28,13 @@ export function createBot(options: BotOptions): BotInterface {
     const commandHandler = new CommandHandler()
 
     const client = new tmi.Client({
-        identity: {
-            username: options.username,
-            password: options.password
-        },
+        identity: options.identity,
         channels: options.channels,
-        options: { debug: options.debug }
+        options: { debug: options.debug },
+        connection: {
+            secure: true,
+            reconnect: true
+        }
     });
 
 
@@ -56,7 +59,8 @@ export function createBot(options: BotOptions): BotInterface {
                 return true
             } catch (error) {
                 //TODO: Make a logger throw an error
-                return error
+                console.log("Failed to connect to twitch %d", error)
+                throw error
             }
         },
 
@@ -67,7 +71,8 @@ export function createBot(options: BotOptions): BotInterface {
                 return true
             } catch (error) {
                 //TODO: Make a logger throw an error
-                return error
+                console.log("Failed to disconnect to twitch %d", error)
+                throw error
             }
         },
 
