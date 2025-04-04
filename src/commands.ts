@@ -18,6 +18,11 @@ export interface CommandOptions {
 
 }
 
+export interface CommandHandlerOptions {
+    prefix: string;
+    requiredPermissions?: Permission[];
+}
+
 export interface Command {
     handler: CommandHandler;
     options: CommandOptions;
@@ -30,21 +35,26 @@ export type Permission = 'broadcaster' | 'moderator' | 'subscriber'
  */
 export class CommandHandler {
 
-    private commands: Map<string, Command>
+    private commands: Map<string, Command>;
+    public options: CommandHandlerOptions;
 
     /**
      * Create a new command handler
      */
-    constructor() {
+    constructor(options: CommandHandlerOptions) {
         this.commands = new Map();
+        this.options = { prefix: options.prefix, requiredPermissions: options.requiredPermissions};
+        //TODO: default required Permissions
     }
 
     /**
      * Register a new command
      * @param commandName - Command name (without prefix)
+     * @param handler - Command handler function
+     * @param options - Command options
      * @returns success status
      */
-    register(commandName: string, handler: CommandHandler, options: CommandOptions): boolean {
+    registerCommand(commandName: string, handler: CommandHandler, options: CommandOptions): boolean {
 
         if (this.commands.get(commandName) !== undefined) {
             //TODO: utilize logger
@@ -72,7 +82,61 @@ export class CommandHandler {
 
         return true;
     }
+    
+
+    /**
+     * Register a new command
+     * @param client - tmi client
+     * @param message - the chat message that called the command
+     * @param tags - the chatters tags which determine permissions
+     * @param channel - the channel the bot will run the command in
+     * @returns success status
+     */
+    processCommand(client: tmi.Client, message: string, tags: tmi.ChatUserstate, channel: string): boolean {
+        if(!message.startsWith(this.options.prefix)) {
+            return false
+        }
+
+        // extract command and arguments
+        const partsOfCommand = message.slice(this.options.prefix.length).split(/\s+/)
+        const commandName = partsOfCommand[0].toLowerCase() // command name is only the first element
+        // TODO: handle additional arguments in commands
+
+        if(!this.commands.has(commandName)) {
+            client.say(channel, "Invalid Command")
+            return false
+        }
+
+        if(!this.checkPermissions(tags, this.options.requiredPermissions || ["broadcaster"])) {
+            client.say(channel, "Permission Denied")
+            return false
+        }
+
+        const command = this.commands.get(commandName) // retrieves command (includes handler and options)
+        // TODO: actually run commands
+
+        return true
+    }
 
 
+    checkPermissions(tags: tmi.ChatUserstate, requiredPermissions: Permission[]): boolean {
+        if(!requiredPermissions || requiredPermissions.length == 0 ) { // checks if requiredPermissions exists or if it has no requirements
+            return true
+        }
+
+
+        return requiredPermissions.some(permission =>{
+            switch(permission) {
+                case "broadcaster":
+                    return (tags.badges && tags.badges.broadcaster)
+                case "moderator":
+                    return (tags.badges && tags.badges.moderator)
+                case "subscriber":
+                    return (tags.badges && tags.badges.subscriber)
+                default:
+                    return false
+            }
+        })
+    }
 
 }
