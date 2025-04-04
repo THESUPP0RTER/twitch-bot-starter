@@ -24,7 +24,7 @@ export interface CommandHandlerOptions {
 }
 
 export interface Command {
-    handler: CommandHandler;
+    commandFunction: CommandHandler;
     options: CommandOptions;
 }
 
@@ -54,7 +54,7 @@ export class CommandHandler {
      * @param options - Command options
      * @returns success status
      */
-    registerCommand(commandName: string, handler: CommandHandler, options: CommandOptions): boolean {
+    registerCommand(commandName: string, commandFunction: CommandHandler, options: CommandOptions): boolean {
 
         if (this.commands.get(commandName) !== undefined) {
             //TODO: utilize logger
@@ -62,13 +62,13 @@ export class CommandHandler {
             return false
         }
 
-        if (typeof handler !== "function") {
+        if (typeof commandFunction !== "function") {
             console.log("Handler function needs to be a function")
             return false
         }
 
         this.commands.set(commandName, {
-            handler,
+            commandFunction,
             options: {
                 description: options.description || "no description",
                 //TODO: add functionality to create specific permissions as a default
