@@ -25,7 +25,7 @@ export interface BotInterface {
 
 export function createBot(options: BotOptions): BotInterface {
 
-    const commandHandler = new CommandHandler()
+    const commandHandler = new CommandHandler({prefix: options.commandPrefix || "!" })
 
     const client = new tmi.Client({
         identity: options.identity,
@@ -42,9 +42,8 @@ export function createBot(options: BotOptions): BotInterface {
         //ignore messages from itself (the bot)
         if (self) return;
 
-        if (message.startsWith(options.commandPrefix || "!")) {
-            //TODO: Handle commands, use a command handler
-            client.say(channel, `@${tags.username}, heya!`);
+        if (message.startsWith(options.commandPrefix || "!")) { // this is redundant, on purpose
+            commandHandler.processCommand(client, channel, message, tags)
         }
 
 
@@ -77,7 +76,7 @@ export function createBot(options: BotOptions): BotInterface {
         },
 
         registerCommand: (commandName: string, handler: CommandHandler, options?: any): boolean => {
-            return commandHandler.register(commandName, handler, options)
+            return commandHandler.registerCommand(commandName, handler, options)
         },
     }
     return botInterface;
