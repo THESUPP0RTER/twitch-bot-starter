@@ -5,6 +5,8 @@
 //We need permissions just to see if they're the broadcaster, mod, sub, vip, etc, or specific users
 //Getters
 
+import * as tmi from "tmi.js"
+const logger = require("./utils/logger")
 
 export interface CommandOptions {
     description?: string;
@@ -27,6 +29,7 @@ export type Permission = 'broadcaster' | 'moderator' | 'subscriber'
  * 
  */
 export class CommandHandler {
+
     private commands: Map<string, Command>
 
     /**
@@ -41,14 +44,16 @@ export class CommandHandler {
      * @param commandName - Command name (without prefix)
      * @returns success status
      */
-    register(commandName: string, handler: CommandHandler, options: CommandOptions) {
+    register(commandName: string, handler: CommandHandler, options: CommandOptions): boolean {
 
         if (this.commands.get(commandName) !== undefined) {
-            //TODO: log this1
+            //TODO: utilize logger
+            console.log("Cannot be an existing command")
             return false
         }
 
         if (typeof handler !== "function") {
+            console.log("Handler function needs to be a function")
             return false
         }
 
@@ -67,6 +72,7 @@ export class CommandHandler {
 
         return true;
     }
+
 
 
 }

@@ -1,4 +1,5 @@
 import * as tmi from 'tmi.js'
+import { CommandHandler } from './commands';
 
 export interface BotOptions {
     username: string;
@@ -13,7 +14,7 @@ export interface BotInterface {
     client: tmi.Client,
     connect(): Promise<Boolean>
     disconnect(): Promise<Boolean>
-    registerCommand(): boolean
+    registerCommand(commandName: string, handler: CommandHandler, options?: any): boolean
 }
 
 /**
@@ -21,6 +22,9 @@ export interface BotInterface {
  */
 
 export function createBot(options: BotOptions): BotInterface {
+
+    const commandHandler = new CommandHandler()
+
     const client = new tmi.Client({
         identity: {
             username: options.username,
@@ -67,8 +71,8 @@ export function createBot(options: BotOptions): BotInterface {
             }
         },
 
-        registerCommand(command: string,) {
-
+        registerCommand: (commandName: string, handler: CommandHandler, options?: any): boolean => {
+            return commandHandler.register(commandName, handler, options)
         },
     }
     return botInterface;
