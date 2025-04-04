@@ -42,7 +42,7 @@ export function createBot(options: BotOptions): BotInterface {
         //ignore messages from itself (the bot)
         if (self) return;
 
-        if (message.startsWith(options.commandPrefix || "!")) { // this is redunant, on purpose
+        if (message.startsWith(options.commandPrefix || "!")) { // this is redundant, on purpose
             commandHandler.processCommand(client, message, tags, channel)
         }
 
