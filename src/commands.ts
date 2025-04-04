@@ -43,7 +43,10 @@ export class CommandHandler {
      */
     constructor(options: CommandHandlerOptions) {
         this.commands = new Map();
-        this.options = { prefix: options.prefix, requiredPermissions: options.requiredPermissions};
+        this.options = { 
+            prefix: options.prefix, 
+            requiredPermissions: options.requiredPermissions
+        };
         //TODO: default required Permissions
     }
 
@@ -87,12 +90,12 @@ export class CommandHandler {
     /**
      * Register a new command
      * @param client - tmi client
+     * @param channel - the channel the bot will run the command in
      * @param message - the chat message that called the command
      * @param tags - the chatters tags which determine permissions
-     * @param channel - the channel the bot will run the command in
      * @returns success status
      */
-    processCommand(client: tmi.Client, message: string, tags: tmi.ChatUserstate, channel: string): boolean {
+    processCommand(client: tmi.Client, channel: string, message: string, tags: tmi.ChatUserstate): boolean {
         if(!message.startsWith(this.options.prefix)) {
             return false
         }
@@ -128,11 +131,11 @@ export class CommandHandler {
         return requiredPermissions.some(permission =>{
             switch(permission) {
                 case "broadcaster":
-                    return (tags.badges && tags.badges.broadcaster)
+                    return (tags.badges?.broadcaster)
                 case "moderator":
-                    return (tags.badges && tags.badges.moderator)
+                    return (tags.badges?.moderator)
                 case "subscriber":
-                    return (tags.badges && tags.badges.subscriber)
+                    return (tags.badges?.subscriber)
                 default:
                     return false
             }

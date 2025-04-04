@@ -43,7 +43,7 @@ export function createBot(options: BotOptions): BotInterface {
         if (self) return;
 
         if (message.startsWith(options.commandPrefix || "!")) { // this is redundant, on purpose
-            commandHandler.processCommand(client, message, tags, channel)
+            commandHandler.processCommand(client, channel, message, tags)
         }
 
 
