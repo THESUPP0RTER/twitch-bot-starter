@@ -24,7 +24,7 @@ export interface CommandHandlerOptions {
 }
 
 export interface Command {
-    commandFunction: CommandHandler;
+    commandFunction: CommandHandler['handler'];
     options: CommandOptions;
 }
 
@@ -43,8 +43,8 @@ export class CommandHandler {
      */
     constructor(options: CommandHandlerOptions) {
         this.commands = new Map();
-        this.options = { 
-            prefix: options.prefix, 
+        this.options = {
+            prefix: options.prefix,
             requiredPermissions: options.requiredPermissions
         };
         //TODO: default required Permissions
@@ -57,7 +57,7 @@ export class CommandHandler {
      * @param options - Command options
      * @returns success status
      */
-    registerCommand(commandName: string, commandFunction: CommandHandler, options: CommandOptions): boolean {
+    registerCommand(commandName: string, commandFunction: CommandHandler['handler'], options: CommandOptions): boolean {
 
         if (this.commands.get(commandName) !== undefined) {
             //TODO: utilize logger
@@ -70,7 +70,7 @@ export class CommandHandler {
             return false
         }
 
-        this.commands.set(commandName, {
+        this.commands.set(commandName.toLowerCase(), {
             commandFunction,
             options: {
                 description: options.description || "no description",
@@ -81,11 +81,10 @@ export class CommandHandler {
                 usage: options.usage || "",
                 timeLimit: options.timeLimit || -1
             }
-        })
-
+        });
         return true;
     }
-    
+
 
     /**
      * Register a new command
@@ -96,40 +95,47 @@ export class CommandHandler {
      * @returns success status
      */
     processCommand(client: tmi.Client, channel: string, message: string, tags: tmi.ChatUserstate): boolean {
-        if(!message.startsWith(this.options.prefix)) {
+        if (!message.startsWith(this.options.prefix)) {
             return false
         }
 
         // extract command and arguments
         const partsOfCommand = message.slice(this.options.prefix.length).split(/\s+/)
         const commandName = partsOfCommand[0].toLowerCase() // command name is only the first element
-        // TODO: handle additional arguments in commands
+        const args = partsOfCommand.slice(1)
 
-        if(!this.commands.has(commandName)) {
+        if (!this.commands.has(commandName)) {
             client.say(channel, "Invalid Command")
             return false
         }
 
-        if(!this.checkPermissions(tags, this.options.requiredPermissions || ["broadcaster"])) {
+        if (!this.checkPermissions(tags, this.options.requiredPermissions || ["broadcaster"])) {
             client.say(channel, "Permission Denied")
             return false
         }
 
         const command = this.commands.get(commandName) // retrieves command (includes handler and options)
-        // TODO: actually run commands
+        if (command === undefined) return false;
 
-        return true
+        try {
+            command.commandFunction(client, channel, tags, args)
+            return true;
+        } catch (error) {
+            console.log("An error occurred while executing the command.")
+            return true;
+        }
+
     }
 
 
     checkPermissions(tags: tmi.ChatUserstate, requiredPermissions: Permission[]): boolean {
-        if(!requiredPermissions || requiredPermissions.length == 0 ) { // checks if requiredPermissions exists or if it has no requirements
+        if (!requiredPermissions || requiredPermissions.length == 0) { // checks if requiredPermissions exists or if it has no requirements
             return true
         }
 
 
-        return requiredPermissions.some(permission =>{
-            switch(permission) {
+        return requiredPermissions.some(permission => {
+            switch (permission) {
                 case "broadcaster":
                     return (tags.badges?.broadcaster)
                 case "moderator":
@@ -142,4 +148,14 @@ export class CommandHandler {
         })
     }
 
+    /**
+     * Command handler function type
+     * This is specifying the type for the "handler" property
+     * It's an indexed access type where you can extract the type of a specific property from another type, in this case CommandHandler['handler'] means:
+     * "I am using the handler property type from the CommandHandler class"
+     * 
+     * This will create a type alias for the function signature without having to repeat it
+     */
+
+    handler(client: tmi.Client, channel: string, tags: tmi.ChatUserstate, args: string[]): void { }
 }
