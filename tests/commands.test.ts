@@ -64,7 +64,7 @@ describe("CommandHandler", () => {
       const result = commandHandler.register(
         "test",
         "not a function" as any,
-        {}
+        {},
       );
       expect(result).toBe(false);
     });
@@ -89,7 +89,7 @@ describe("CommandHandler", () => {
           channel: "#channel",
           tags: tags,
           args: [],
-        })
+        }),
       );
     });
   });
@@ -100,7 +100,7 @@ describe("CommandHandler", () => {
         mockClient,
         "#channel",
         "test",
-        {} as tmi.ChatUserstate
+        {} as tmi.ChatUserstate,
       );
       expect(result).toBe(false);
     });
@@ -110,7 +110,7 @@ describe("CommandHandler", () => {
         mockClient,
         "#channel",
         "!nonexistent",
-        {} as tmi.ChatUserstate
+        {} as tmi.ChatUserstate,
       );
       expect(result).toBe(false);
       expect(mockSay).toHaveBeenCalledWith("#channel", "Invalid Command");
@@ -131,7 +131,7 @@ describe("CommandHandler", () => {
         mockClient,
         "#channel",
         "!test arg1 arg2",
-        tags
+        tags,
       );
 
       expect(result).toBe(true);
@@ -144,7 +144,7 @@ describe("CommandHandler", () => {
           channel: "#channel",
           tags: tags,
           args: ["arg1", "arg2"],
-        })
+        }),
       );
     });
 
@@ -163,7 +163,7 @@ describe("CommandHandler", () => {
         mockClient,
         "#channel",
         "!test",
-        tags
+        tags,
       );
 
       expect(result).toBe(false);
@@ -189,12 +189,69 @@ describe("CommandHandler", () => {
         mockClient,
         "#channel",
         "!test",
-        tags
+        tags,
       );
 
       expect(result).toBe(true);
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe("getCommands", () => {
+    it("should return an empty array of commands if there were no registered commands", () => {
+      const commands = commandHandler.getCommands();
+      expect(commands).toEqual([]);
+      expect(commands.length).toBe(0);
+    });
+
+    it("should return all registered commands with their details", () => {
+      const mockHandler = jest.fn();
+
+      commandHandler.register("test1", mockHandler, {
+        description: "test command 1",
+        usage: "!test1 [arg]",
+        requiredPermissions: ["broadcaster", "moderator"],
+      });
+      commandHandler.register("test2", mockHandler, {
+        description: "test command 2",
+        usage: "!test2 [arg]",
+      });
+      commandHandler.register("test3", mockHandler, {
+        requiredPermissions: ["subscriber"],
+      });
+
+      //Get all commands
+      const commands = commandHandler.getCommands();
+
+      expect(commands.length).toBe(3);
+
+      // Sort the commands by name to ensure consistent order for comparison
+      const sortedCommands = [...commands].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+
+      // Verify each command individually
+      expect(sortedCommands[0]).toEqual({
+        name: "test1",
+        description: "test command 1",
+        usage: "!test1 [arg]",
+        permissions: ["broadcaster", "moderator"],
+      });
+
+      expect(sortedCommands[1]).toEqual({
+        name: "test2",
+        description: "test command 2",
+        usage: "!test2 [arg]",
+        permissions: ["broadcaster"],
+      });
+
+      expect(sortedCommands[2]).toEqual({
+        name: "test3",
+        description: "no description",
+        usage: "",
+        permissions: ["subscriber"],
+      });
     });
   });
 
@@ -234,7 +291,7 @@ describe("CommandHandler", () => {
       } as tmi.ChatUserstate;
 
       expect(
-        commandHandler.checkPermissions(tags, ["broadcaster", "moderator"])
+        commandHandler.checkPermissions(tags, ["broadcaster", "moderator"]),
       ).toBe(false);
     });
   });

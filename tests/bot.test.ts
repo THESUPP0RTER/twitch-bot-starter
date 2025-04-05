@@ -64,7 +64,7 @@ describe("Bot Module", () => {
           password: "mock_token",
         },
         channels: ["test_channel"],
-      })
+      }),
     );
 
     const mockTmiClient = (tmi.Client as jest.Mock).mock.results[0].value;
@@ -98,7 +98,7 @@ describe("Bot Module", () => {
 
     // Get the message handler registered with the tmi client
     const onHandler = mockTmiClient.on.mock.calls.find(
-      (call: any[]) => call[0] === "message"
+      (call: any[]) => call[0] === "message",
     );
     expect(onHandler).toBeDefined();
 
@@ -120,7 +120,7 @@ describe("Bot Module", () => {
       mockTmiClient,
       "#channel",
       "!command",
-      userTags
+      userTags,
     );
   });
 });
