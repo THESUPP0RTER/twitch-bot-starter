@@ -46,7 +46,7 @@ export function createBot(options: BotOptions): BotInterface {
         return true;
       } catch (error) {
         //TODO: Make a logger throw an error
-        console.log("Failed to connect to twitch %d", error);
+        console.log("Failed to connect to twitch %s", error);
         throw error;
       }
     },
@@ -57,7 +57,7 @@ export function createBot(options: BotOptions): BotInterface {
         return true;
       } catch (error) {
         //TODO: Make a logger throw an error
-        console.log("Failed to disconnect to twitch %d", error);
+        console.log("Failed to disconnect to twitch %s", error);
         throw error;
       }
     },

@@ -154,7 +154,7 @@ export class CommandHandler {
       command.commandFunction(context);
       return true;
     } catch (error) {
-      console.log("An error occurred while executing the command: %d", error);
+      console.log("An error occurred while executing the command: %s", String(error));
       return true;
     }
   }
