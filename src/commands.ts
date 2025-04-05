@@ -121,7 +121,7 @@ export class CommandHandler {
             command.commandFunction(client, channel, tags, args)
             return true;
         } catch (error) {
-            console.log("An error occurred while executing the command.")
+            console.log("An error occurred while executing the command: %d", error)
             return true;
         }
 
