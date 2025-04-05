@@ -1,5 +1,6 @@
 import * as tmi from "tmi.js";
-import { CommandHandler } from "../src/commands";
+import { CommandHandler, CommandContext } from "../src/commands";
+import { BotInterface } from "../src/bot";
 
 // Mock tmi.js client
 const mockSay = jest.fn();
@@ -7,11 +8,22 @@ const mockClient = {
   say: mockSay,
 } as unknown as tmi.Client;
 
+// Mock bot interface
+const mockBot: BotInterface = {
+  client: mockClient,
+  connect: jest.fn().mockResolvedValue(true),
+  disconnect: jest.fn().mockResolvedValue(true),
+  registerCommand: jest.fn().mockReturnValue(true),
+};
+
 describe("CommandHandler", () => {
   let commandHandler: CommandHandler;
 
   beforeEach(() => {
-    commandHandler = new CommandHandler({ prefix: "!" });
+    commandHandler = new CommandHandler({
+      prefix: "!",
+      bot: mockBot,
+    });
     mockSay.mockClear();
   });
 
@@ -24,15 +36,16 @@ describe("CommandHandler", () => {
       const handler = new CommandHandler({
         prefix: "!",
         requiredPermissions: ["moderator"],
+        bot: mockBot,
       });
       expect(handler.options.requiredPermissions).toEqual(["moderator"]);
     });
   });
 
-  describe("registerCommand", () => {
+  describe("register", () => {
     it("should register a command successfully", () => {
       const mockHandler = jest.fn();
-      const result = commandHandler.registerCommand("test", mockHandler, {
+      const result = commandHandler.register("test", mockHandler, {
         description: "Test command",
       });
 
@@ -41,18 +54,14 @@ describe("CommandHandler", () => {
 
     it("should not register a command if it already exists", () => {
       const mockHandler = jest.fn();
-      commandHandler.registerCommand("test", mockHandler, {});
+      commandHandler.register("test", mockHandler, {});
 
-      const secondResult = commandHandler.registerCommand(
-        "test",
-        mockHandler,
-        {}
-      );
+      const secondResult = commandHandler.register("test", mockHandler, {});
       expect(secondResult).toBe(false);
     });
 
     it("should not register a command if handler is not a function", () => {
-      const result = commandHandler.registerCommand(
+      const result = commandHandler.register(
         "test",
         "not a function" as any,
         {}
@@ -62,16 +71,26 @@ describe("CommandHandler", () => {
 
     it("should set default options if not provided", () => {
       const mockHandler = jest.fn();
-      const result = commandHandler.registerCommand("test", mockHandler, {});
+      commandHandler.register("test", mockHandler, {});
 
-      // We can't directly access private property 'commands', so we'll test through processCommand
+      // Test with processCommand
       const tags = {
         badges: { broadcaster: "1" },
         username: "testuser",
       } as tmi.ChatUserstate;
 
       commandHandler.processCommand(mockClient, "#channel", "!test", tags);
-      expect(mockHandler).toHaveBeenCalled();
+
+      // Verify that the handler was called with a context object
+      expect(mockHandler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          bot: mockBot,
+          client: mockClient,
+          channel: "#channel",
+          tags: tags,
+          args: [],
+        })
+      );
     });
   });
 
@@ -99,7 +118,7 @@ describe("CommandHandler", () => {
 
     it("should execute the command if it exists and user has permission", () => {
       const mockHandler = jest.fn();
-      commandHandler.registerCommand("test", mockHandler, {
+      commandHandler.register("test", mockHandler, {
         requiredPermissions: ["broadcaster"],
       });
 
@@ -116,15 +135,22 @@ describe("CommandHandler", () => {
       );
 
       expect(result).toBe(true);
-      expect(mockHandler).toHaveBeenCalledWith(mockClient, "#channel", tags, [
-        "arg1",
-        "arg2",
-      ]);
+
+      // Verify context object was passed correctly
+      expect(mockHandler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          bot: mockBot,
+          client: mockClient,
+          channel: "#channel",
+          tags: tags,
+          args: ["arg1", "arg2"],
+        })
+      );
     });
 
     it("should return false if user lacks permission", () => {
       const mockHandler = jest.fn();
-      commandHandler.registerCommand("test", mockHandler, {
+      commandHandler.register("test", mockHandler, {
         requiredPermissions: ["broadcaster"],
       });
 
@@ -150,7 +176,7 @@ describe("CommandHandler", () => {
         throw new Error("Command error");
       });
 
-      commandHandler.registerCommand("test", mockHandler, {});
+      commandHandler.register("test", mockHandler, {});
 
       const tags = {
         badges: { broadcaster: "1" },

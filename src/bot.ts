@@ -18,7 +18,7 @@ export interface BotInterface {
   registerCommand(
     commandName: string,
     handler: CommandHandlerFunction,
-    options?: any,
+    options?: any
   ): boolean;
 }
 
@@ -27,10 +27,6 @@ export interface BotInterface {
  */
 
 export function createBot(options: BotOptions): BotInterface {
-  const commandHandler = new CommandHandler({
-    prefix: options.commandPrefix || "!",
-  });
-
   const client = new tmi.Client({
     identity: options.identity,
     channels: options.channels,
@@ -41,28 +37,10 @@ export function createBot(options: BotOptions): BotInterface {
     },
   });
 
-  client.on(
-    "message",
-    (
-      channel: string,
-      tags: tmi.ChatUserstate,
-      message: string,
-      self: boolean,
-    ) => {
-      //ignore messages from itself (the bot)
-      if (self) return;
-
-      if (message.startsWith(options.commandPrefix || "!")) {
-        // this is redundant, on purpose
-        commandHandler.processCommand(client, channel, message, tags);
-      }
-    },
-  );
-
+  //Make the botInterface - we need this first to pass into the command handler
   const botInterface: BotInterface = {
     client,
     connect: async (): Promise<Boolean> => {
-      //Potential bug, if connection doesn't work, then it's probably here
       try {
         await client.connect();
         return true;
@@ -74,7 +52,6 @@ export function createBot(options: BotOptions): BotInterface {
     },
 
     disconnect: async (): Promise<Boolean> => {
-      //Potential bug, if connection doesn't work, then it's probably here
       try {
         await client.disconnect();
         return true;
@@ -87,11 +64,41 @@ export function createBot(options: BotOptions): BotInterface {
 
     registerCommand: (
       commandName: string,
-      handler: CommandHandlerFunction,
-      options?: any,
+      handlerFunction: CommandHandlerFunction,
+      options?: any
     ): boolean => {
-      return commandHandler.registerCommand(commandName, handler, options);
+      return false; //default value that will be replaced
     },
   };
+
+  const ch = new CommandHandler({
+    prefix: options.commandPrefix || "!",
+    bot: botInterface,
+  });
+
+  botInterface.registerCommand = (
+    command: string,
+    handlerFunction: CommandHandlerFunction,
+    options: any
+  ): boolean => {
+    return ch.register(command, handlerFunction, options);
+  };
+
+  //Handle Incoming messages
+  client.on(
+    "message",
+    (
+      channel: string,
+      tags: tmi.ChatUserstate,
+      message: string,
+      self: boolean
+    ) => {
+      //ignore messages from itself (the bot)
+      if (self) return;
+
+      ch.processCommand(client, channel, message, tags);
+    }
+  );
+
   return botInterface;
 }

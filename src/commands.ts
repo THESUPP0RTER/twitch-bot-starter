@@ -6,7 +6,16 @@
 //Getters
 
 import * as tmi from "tmi.js";
+import { BotInterface } from "./bot";
 const logger = require("./utils/logger");
+
+export interface CommandContext {
+  bot: BotInterface;
+  client: tmi.Client;
+  channel: string;
+  tags: tmi.ChatUserstate;
+  args: string[];
+}
 
 export interface CommandOptions {
   description?: string;
@@ -17,16 +26,12 @@ export interface CommandOptions {
   timeLimit?: number;
 }
 
-export type CommandHandlerFunction = (
-  client: tmi.Client,
-  channel: string,
-  tags: tmi.ChatUserstate,
-  args: string[],
-) => void;
+export type CommandHandlerFunction = (context: CommandContext) => void;
 
 export interface CommandHandlerOptions {
   prefix: string;
   requiredPermissions?: Permission[];
+  bot: BotInterface;
 }
 
 export interface Command {
@@ -51,6 +56,7 @@ export class CommandHandler {
     this.options = {
       prefix: options.prefix,
       requiredPermissions: options.requiredPermissions,
+      bot: options.bot,
     };
     //TODO: default required Permissions
   }
@@ -62,10 +68,10 @@ export class CommandHandler {
    * @param options - Command options
    * @returns success status
    */
-  registerCommand(
+  register(
     commandName: string,
     commandFunction: CommandHandlerFunction,
-    options: CommandOptions,
+    options: CommandOptions
   ): boolean {
     if (this.commands.get(commandName) !== undefined) {
       //TODO: utilize logger
@@ -105,7 +111,7 @@ export class CommandHandler {
     client: tmi.Client,
     channel: string,
     message: string,
-    tags: tmi.ChatUserstate,
+    tags: tmi.ChatUserstate
   ): boolean {
     if (!message.startsWith(this.options.prefix)) {
       return false;
@@ -126,7 +132,7 @@ export class CommandHandler {
     if (
       !this.checkPermissions(
         tags,
-        this.options.requiredPermissions || ["broadcaster"],
+        this.options.requiredPermissions || ["broadcaster"]
       )
     ) {
       client.say(channel, "Permission Denied");
@@ -137,7 +143,15 @@ export class CommandHandler {
     if (command === undefined) return false;
 
     try {
-      command.commandFunction(client, channel, tags, args);
+      const context: CommandContext = {
+        bot: this.options.bot,
+        client: client,
+        channel: channel,
+        tags: tags,
+        args: args,
+      };
+
+      command.commandFunction(context);
       return true;
     } catch (error) {
       console.log("An error occurred while executing the command: %d", error);
@@ -147,7 +161,7 @@ export class CommandHandler {
 
   checkPermissions(
     tags: tmi.ChatUserstate,
-    requiredPermissions: Permission[],
+    requiredPermissions: Permission[]
   ): boolean {
     if (!requiredPermissions || requiredPermissions.length == 0) {
       // checks if requiredPermissions exists or if it has no requirements
