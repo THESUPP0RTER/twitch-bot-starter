@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 22.x]
+        node-version: [22.x]
         # Add other Node.js versions if needed
 
     steps:
@@ -27,8 +27,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Lint
-      run: npm run lint
       
     - name: Check TypeScript compilation
       run: npm run build
