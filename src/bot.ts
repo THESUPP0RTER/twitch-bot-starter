@@ -1,5 +1,5 @@
 import * as tmi from 'tmi.js'
-import { CommandHandler } from './commands';
+import { CommandHandler, CommandHandlerFunction } from './commands';
 
 export interface BotOptions {
     identity: {
@@ -16,7 +16,7 @@ export interface BotInterface {
     client: tmi.Client,
     connect(): Promise<Boolean>
     disconnect(): Promise<Boolean>
-    registerCommand(commandName: string, handler: CommandHandler, options?: any): boolean
+    registerCommand(commandName: string, handler: CommandHandlerFunction, options?: any): boolean
 }
 
 /**
@@ -25,7 +25,7 @@ export interface BotInterface {
 
 export function createBot(options: BotOptions): BotInterface {
 
-    const commandHandler = new CommandHandler({prefix: options.commandPrefix || "!" })
+    const commandHandler = new CommandHandler({ prefix: options.commandPrefix || "!" })
 
     const client = new tmi.Client({
         identity: options.identity,
@@ -75,7 +75,7 @@ export function createBot(options: BotOptions): BotInterface {
             }
         },
 
-        registerCommand: (commandName: string, handler: CommandHandler, options?: any): boolean => {
+        registerCommand: (commandName: string, handler: CommandHandlerFunction, options?: any): boolean => {
             return commandHandler.registerCommand(commandName, handler, options)
         },
     }

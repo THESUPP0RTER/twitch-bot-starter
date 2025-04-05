@@ -18,13 +18,20 @@ export interface CommandOptions {
 
 }
 
+export type CommandHandlerFunction = (
+    client: tmi.Client,
+    channel: string,
+    tags: tmi.ChatUserstate,
+    args: string[]
+) => void;
+
 export interface CommandHandlerOptions {
     prefix: string;
     requiredPermissions?: Permission[];
 }
 
 export interface Command {
-    commandFunction: CommandHandler['handler'];
+    commandFunction: CommandHandlerFunction;
     options: CommandOptions;
 }
 
@@ -57,7 +64,7 @@ export class CommandHandler {
      * @param options - Command options
      * @returns success status
      */
-    registerCommand(commandName: string, commandFunction: CommandHandler['handler'], options: CommandOptions): boolean {
+    registerCommand(commandName: string, commandFunction: CommandHandlerFunction, options: CommandOptions): boolean {
 
         if (this.commands.get(commandName) !== undefined) {
             //TODO: utilize logger
@@ -132,8 +139,6 @@ export class CommandHandler {
         if (!requiredPermissions || requiredPermissions.length == 0) { // checks if requiredPermissions exists or if it has no requirements
             return true
         }
-
-
         return requiredPermissions.some(permission => {
             switch (permission) {
                 case "broadcaster":
@@ -147,15 +152,4 @@ export class CommandHandler {
             }
         })
     }
-
-    /**
-     * Command handler function type
-     * This is specifying the type for the "handler" property
-     * It's an indexed access type where you can extract the type of a specific property from another type, in this case CommandHandler['handler'] means:
-     * "I am using the handler property type from the CommandHandler class"
-     * 
-     * This will create a type alias for the function signature without having to repeat it
-     */
-
-    handler(client: tmi.Client, channel: string, tags: tmi.ChatUserstate, args: string[]): void { }
 }
