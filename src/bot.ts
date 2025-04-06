@@ -18,7 +18,7 @@ export interface BotInterface {
   registerCommand(
     commandName: string,
     handler: CommandHandlerFunction,
-    options?: any
+    options?: any,
   ): boolean;
 }
 
@@ -65,7 +65,7 @@ export function createBot(options: BotOptions): BotInterface {
     registerCommand: (
       commandName: string,
       handlerFunction: CommandHandlerFunction,
-      options?: any
+      options?: any,
     ): boolean => {
       return false; //default value that will be replaced
     },
@@ -79,7 +79,7 @@ export function createBot(options: BotOptions): BotInterface {
   botInterface.registerCommand = (
     command: string,
     handlerFunction: CommandHandlerFunction,
-    options: any
+    options: any,
   ): boolean => {
     return ch.register(command, handlerFunction, options);
   };
@@ -91,13 +91,13 @@ export function createBot(options: BotOptions): BotInterface {
       channel: string,
       tags: tmi.ChatUserstate,
       message: string,
-      self: boolean
+      self: boolean,
     ) => {
       //ignore messages from itself (the bot)
       if (self) return;
 
       ch.processCommand(client, channel, message, tags);
-    }
+    },
   );
 
   return botInterface;
