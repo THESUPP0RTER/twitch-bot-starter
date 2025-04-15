@@ -206,7 +206,7 @@ export class CommandHandler {
         name,
         description: command.options.description || "",
         usage: command.options.usage || "",
-        permissions: command.options.requiredPermissions || [],
+        permissions: command.options.requiredPermissions || ['broadcaster'],
       });
     });
 
