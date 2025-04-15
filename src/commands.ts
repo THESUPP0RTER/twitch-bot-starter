@@ -185,7 +185,7 @@ export class CommandHandler {
   }
 
   /**
-   * Get all regiestered commands
+   * Get all registered commands
    * @returns Array of commands
    */
   getCommands(): Array<{
