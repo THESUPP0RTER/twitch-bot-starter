@@ -12,6 +12,32 @@ const levels = {
     silly: 6
 };
 
+const settings = {
+    level: levels,
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with importance level of `error` or higher to `error.log`
+        //   (i.e., error, fatal, but not other levels)
+        //
+        new winston.transports.File({ 
+            filename: 'error.log', 
+            level: 'error' 
+        }),
+        //
+        // - Write all logs with importance level of `info` or higher to `combined.log`
+        //   (i.e., fatal, error, warn, and info, but not trace)
+        //
+        new winston.transports.File({ 
+            filename: 'combined.log', 
+            level: 'info'}),
+    ]
+}
+
+module.exports = new winston.createLogger(settings)
+
+/*
 const logger = winston.createLogger({
     level: levels,
     format: winston.format.json(),
@@ -26,7 +52,7 @@ const logger = winston.createLogger({
         // - Write all logs with importance level of `info` or higher to `combined.log`
         //   (i.e., fatal, error, warn, and info, but not trace)
         //
-        new winston.transports.File({ filename: 'combined.log' }),
+        new winston.transports.File({ filename: 'combined.log', level: 'info'}),
     ]
 });
 
@@ -40,9 +66,5 @@ if (process.env.NODE_ENV !== 'production') {
     }));
 }
 
-
-//logger.stream = {
-//   write: (message) => {
-//        console.log(message)
-//   }
-//}
+logger.log('info', "testing")
+*/
