@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { createBot } from "./src/bot";
 
+const winston = require("winston");
 const logger = require('./src/utils/logger')
 
 
@@ -18,13 +19,24 @@ async function bootstrap() {
     });
 
         await bot.connect();
-        console.log("bot successfully made")
-        logger.log('info', "Bot Created")
+        logger.info('Bot created')
     } catch (error) {
-        console.log("Failed to create bot: %d", error);
-        logger.log('error', "Failed to create bot")
+        logger.error("Failed to create bot: %s", error)
     }
 
 }
+
+// If we're not in production then log to the `console` with the format:
+// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+
+// Not sure if this is the best place for this, but it'll work for now
+if (process.env.NODE_ENV !== "production") {
+    logger.add(
+      new winston.transports.Console({
+        format: winston.format.simple(),
+      }),
+    );
+}
+
 
 bootstrap();
