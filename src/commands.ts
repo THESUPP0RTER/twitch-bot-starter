@@ -71,7 +71,7 @@ export class CommandHandler {
   register(
     commandName: string,
     commandFunction: CommandHandlerFunction,
-    options: CommandOptions
+    options: CommandOptions,
   ): boolean {
     if (this.commands.get(commandName) !== undefined) {
       //TODO: utilize logger
@@ -111,7 +111,7 @@ export class CommandHandler {
     client: tmi.Client,
     channel: string,
     message: string,
-    tags: tmi.ChatUserstate
+    tags: tmi.ChatUserstate,
   ): boolean {
     if (!message.startsWith(this.options.prefix)) {
       return false;
@@ -132,7 +132,7 @@ export class CommandHandler {
     if (
       !this.checkPermissions(
         tags,
-        this.options.requiredPermissions || ["broadcaster"]
+        this.options.requiredPermissions || ["broadcaster"],
       )
     ) {
       client.say(channel, "Permission Denied");
@@ -154,14 +154,17 @@ export class CommandHandler {
       command.commandFunction(context);
       return true;
     } catch (error) {
-      console.log("An error occurred while executing the command: %s", String(error));
+      console.log(
+        "An error occurred while executing the command: %s",
+        String(error),
+      );
       return true;
     }
   }
 
   checkPermissions(
     tags: tmi.ChatUserstate,
-    requiredPermissions: Permission[]
+    requiredPermissions: Permission[],
   ): boolean {
     if (!requiredPermissions || requiredPermissions.length == 0) {
       // checks if requiredPermissions exists or if it has no requirements
@@ -179,5 +182,34 @@ export class CommandHandler {
           return false;
       }
     });
+  }
+
+  /**
+   * Get all registered commands
+   * @returns Array of commands
+   */
+  getCommands(): Array<{
+    name: string;
+    description: string;
+    usage: string;
+    permissions: Permission[];
+  }> {
+    const commands: Array<{
+      name: string;
+      description: string;
+      usage: string;
+      permissions: Permission[];
+    }> = [];
+
+    this.commands.forEach((command, name) => {
+      commands.push({
+        name,
+        description: command.options.description || "",
+        usage: command.options.usage || "",
+        permissions: command.options.requiredPermissions || ['broadcaster'],
+      });
+    });
+
+    return commands;
   }
 }
