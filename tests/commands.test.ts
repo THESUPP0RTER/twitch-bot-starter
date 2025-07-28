@@ -183,7 +183,8 @@ describe("CommandHandler", () => {
         username: "testuser",
       } as tmi.ChatUserstate;
 
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
+      const logger = require("../src/utils/logger");
+      const loggerSpy = jest.spyOn(logger, "error").mockImplementation();
 
       const result = commandHandler.processCommand(
         mockClient,
@@ -193,8 +194,8 @@ describe("CommandHandler", () => {
       );
 
       expect(result).toBe(true);
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
+      expect(loggerSpy).toHaveBeenCalled();
+      loggerSpy.mockRestore();
     });
   });
 
