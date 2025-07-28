@@ -74,13 +74,12 @@ export class CommandHandler {
     options: CommandOptions,
   ): boolean {
     if (this.commands.get(commandName) !== undefined) {
-      //TODO: utilize logger
-      console.log("Cannot be an existing command");
+      logger.warn("Cannot be an existing command");
       return false;
     }
 
     if (typeof commandFunction !== "function") {
-      console.log("Handler function needs to be a function");
+      logger.error("Handler function needs to be a function");
       return false;
     }
 
@@ -154,7 +153,7 @@ export class CommandHandler {
       command.commandFunction(context);
       return true;
     } catch (error) {
-      console.log(
+      logger.error(
         "An error occurred while executing the command: %s",
         String(error),
       );

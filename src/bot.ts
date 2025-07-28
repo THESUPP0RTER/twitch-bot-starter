@@ -1,5 +1,6 @@
 import * as tmi from "tmi.js";
 import { CommandHandler, CommandHandlerFunction } from "./commands";
+const logger = require('./utils/logger');
 
 export interface BotOptions {
   identity: {
@@ -45,8 +46,7 @@ export function createBot(options: BotOptions): BotInterface {
         await client.connect();
         return true;
       } catch (error) {
-        //TODO: Make a logger throw an error
-        console.log("Failed to connect to twitch %s", error);
+        logger.error("Failed to connect to twitch %s", error);
         throw error;
       }
     },
@@ -56,8 +56,7 @@ export function createBot(options: BotOptions): BotInterface {
         await client.disconnect();
         return true;
       } catch (error) {
-        //TODO: Make a logger throw an error
-        console.log("Failed to disconnect to twitch %s", error);
+        logger.error("Failed to disconnect to twitch %s", error);
         throw error;
       }
     },
