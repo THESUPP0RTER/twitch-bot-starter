@@ -5,9 +5,9 @@
 //We need permissions just to see if they're the broadcaster, mod, sub, vip, etc, or specific users
 //Getters
 
-import * as tmi from "tmi.js";
-import { BotInterface } from "./bot";
-const logger = require("./utils/logger");
+import * as tmi from 'tmi.js';
+import { BotInterface } from './bot';
+const logger = require('./utils/logger');
 
 export interface CommandContext {
   bot: BotInterface;
@@ -39,7 +39,7 @@ export interface Command {
   options: CommandOptions;
 }
 
-export type Permission = "broadcaster" | "moderator" | "subscriber";
+export type Permission = 'broadcaster' | 'moderator' | 'subscriber';
 /**
  *Command handler class for managing chat commands
  *
@@ -71,27 +71,27 @@ export class CommandHandler {
   register(
     commandName: string,
     commandFunction: CommandHandlerFunction,
-    options: CommandOptions,
+    options: CommandOptions
   ): boolean {
     if (this.commands.get(commandName) !== undefined) {
-      logger.warn("Cannot be an existing command");
+      logger.warn('Cannot be an existing command');
       return false;
     }
 
-    if (typeof commandFunction !== "function") {
-      logger.error("Handler function needs to be a function");
+    if (typeof commandFunction !== 'function') {
+      logger.error('Handler function needs to be a function');
       return false;
     }
 
     this.commands.set(commandName.toLowerCase(), {
       commandFunction,
       options: {
-        description: options.description || "no description",
+        description: options.description || 'no description',
         //TODO: add functionality to create specific permissions as a default
-        requiredPermissions: options.requiredPermissions || ["broadcaster"],
+        requiredPermissions: options.requiredPermissions || ['broadcaster'],
         approvedUsers: options.approvedUsers || [],
         notifyDenial: options.notifyDenial || false,
-        usage: options.usage || "",
+        usage: options.usage || '',
         timeLimit: options.timeLimit || -1,
       },
     });
@@ -110,7 +110,7 @@ export class CommandHandler {
     client: tmi.Client,
     channel: string,
     message: string,
-    tags: tmi.ChatUserstate,
+    tags: tmi.ChatUserstate
   ): boolean {
     if (!message.startsWith(this.options.prefix)) {
       return false;
@@ -124,22 +124,24 @@ export class CommandHandler {
     const args = partsOfCommand.slice(1);
 
     if (!this.commands.has(commandName)) {
-      client.say(channel, "Invalid Command");
+      client.say(channel, 'Invalid Command');
       return false;
     }
 
     if (
       !this.checkPermissions(
         tags,
-        this.options.requiredPermissions || ["broadcaster"],
+        this.options.requiredPermissions || ['broadcaster']
       )
     ) {
-      client.say(channel, "Permission Denied");
+      client.say(channel, 'Permission Denied');
       return false;
     }
 
     const command = this.commands.get(commandName); // retrieves command (includes handler and options)
-    if (command === undefined) return false;
+    if (command === undefined) {
+      return false;
+    }
 
     try {
       const context: CommandContext = {
@@ -154,8 +156,8 @@ export class CommandHandler {
       return true;
     } catch (error) {
       logger.error(
-        "An error occurred while executing the command: %s",
-        String(error),
+        'An error occurred while executing the command: %s',
+        String(error)
       );
       return true;
     }
@@ -163,19 +165,19 @@ export class CommandHandler {
 
   checkPermissions(
     tags: tmi.ChatUserstate,
-    requiredPermissions: Permission[],
+    requiredPermissions: Permission[]
   ): boolean {
-    if (!requiredPermissions || requiredPermissions.length == 0) {
+    if (!requiredPermissions || requiredPermissions.length === 0) {
       // checks if requiredPermissions exists or if it has no requirements
       return true;
     }
-    return requiredPermissions.some((permission) => {
+    return requiredPermissions.some(permission => {
       switch (permission) {
-        case "broadcaster":
+        case 'broadcaster':
           return tags.badges?.broadcaster;
-        case "moderator":
+        case 'moderator':
           return tags.badges?.moderator;
-        case "subscriber":
+        case 'subscriber':
           return tags.badges?.subscriber;
         default:
           return false;
@@ -203,8 +205,8 @@ export class CommandHandler {
     this.commands.forEach((command, name) => {
       commands.push({
         name,
-        description: command.options.description || "",
-        usage: command.options.usage || "",
+        description: command.options.description || '',
+        usage: command.options.usage || '',
         permissions: command.options.requiredPermissions || ['broadcaster'],
       });
     });

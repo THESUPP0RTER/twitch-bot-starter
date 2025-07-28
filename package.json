@@ -7,8 +7,15 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only --experimental-specifier-resolution=node index.ts",
-    "format": "prettier --write \"{src,tests}/**/*.ts\"",
-    "test": "jest"
+    "format": "prettier --write \"{src,tests}/**/*.ts\" index.ts",
+    "format:check": "prettier --check \"{src,tests}/**/*.ts\" index.ts",
+    "lint": "eslint \"{src,tests}/**/*.ts\" index.ts",
+    "lint:fix": "eslint \"{src,tests}/**/*.ts\" index.ts --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "ci": "npm run type-check && npm run lint && npm run format:check && npm run test"
   },
   "repository": {
     "type": "git",

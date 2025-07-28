@@ -1,7 +1,9 @@
 node_modules
 dist
 coverage
-build
-.github
-.vscode
-*.md
+*.log
+.env
+.env.*
+package-lock.json
+*.min.js
+*.min.css
