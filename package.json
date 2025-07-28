@@ -7,8 +7,15 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only --experimental-specifier-resolution=node index.ts",
-    "format": "prettier --write \"{src,tests}/**/*.ts\"",
-    "test": "jest"
+    "format": "prettier --write \"{src,tests}/**/*.ts\" index.ts",
+    "format:check": "prettier --check \"{src,tests}/**/*.ts\" index.ts",
+    "lint": "eslint \"{src,tests}/**/*.ts\" index.ts",
+    "lint:fix": "eslint \"{src,tests}/**/*.ts\" index.ts --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "ci": "npm run type-check && npm run lint && npm run format:check && npm run test"
   },
   "repository": {
     "type": "git",
@@ -34,7 +41,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.14.0",
+    "@types/node": "^24.0.0",
     "@types/tmi.js": "^1.8.6",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",

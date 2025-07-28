@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  twitch-bot:
+    image: node:24-alpine
+    container_name: twitch-bot
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+      - BOT_USERNAME=${BOT_USERNAME}
+      - OAUTH_TOKEN=${OAUTH_TOKEN}
+      - CHANNELS=${CHANNELS}
+    command: sh -c "npm ci --omit=dev && npm run build && npm start"
+    restart: unless-stopped
+    networks:
+      - bot-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add a database service if needed
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: twitch-bot-db
+  #   environment:
+  #     POSTGRES_DB: twitch_bot
+  #     POSTGRES_USER: bot_user
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - bot-network
+  #   restart: unless-stopped
+
+  # Optional: Add Redis for caching
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: twitch-bot-redis
+  #   networks:
+  #     - bot-network
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis_data:/data
+
+  # Optional: Add monitoring with Prometheus
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: twitch-bot-prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+  #   networks:
+  #     - bot-network
+  #   restart: unless-stopped
+
+networks:
+  bot-network:
+    driver: bridge
+
+# Uncomment if using database/redis services
+# volumes:
+#   postgres_data:
+#   redis_data:
+#   prometheus_data:

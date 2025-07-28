@@ -1,5 +1,5 @@
-import * as tmi from "tmi.js";
-import { CommandHandler, CommandHandlerFunction } from "./commands";
+import * as tmi from 'tmi.js';
+import { CommandHandler, CommandHandlerFunction } from './commands';
 const logger = require('./utils/logger');
 
 export interface BotOptions {
@@ -14,12 +14,12 @@ export interface BotOptions {
 
 export interface BotInterface {
   client: tmi.Client;
-  connect(): Promise<Boolean>;
-  disconnect(): Promise<Boolean>;
+  connect(): Promise<boolean>;
+  disconnect(): Promise<boolean>;
   registerCommand(
     commandName: string,
     handler: CommandHandlerFunction,
-    options?: any,
+    options?: any
   ): boolean;
 }
 
@@ -41,62 +41,64 @@ export function createBot(options: BotOptions): BotInterface {
   //Make the botInterface - we need this first to pass into the command handler
   const botInterface: BotInterface = {
     client,
-    connect: async (): Promise<Boolean> => {
+    connect: async (): Promise<boolean> => {
       try {
         await client.connect();
         return true;
       } catch (error) {
-        logger.error("Failed to connect to twitch %s", error);
+        logger.error('Failed to connect to twitch %s', error);
         throw error;
       }
     },
 
-    disconnect: async (): Promise<Boolean> => {
+    disconnect: async (): Promise<boolean> => {
       try {
         await client.disconnect();
         return true;
       } catch (error) {
-        logger.error("Failed to disconnect to twitch %s", error);
+        logger.error('Failed to disconnect to twitch %s', error);
         throw error;
       }
     },
 
     registerCommand: (
-      commandName: string,
-      handlerFunction: CommandHandlerFunction,
-      options?: any,
+      _commandName: string,
+      _handlerFunction: CommandHandlerFunction,
+      _options?: any
     ): boolean => {
       return false; //default value that will be replaced
     },
   };
 
   const ch = new CommandHandler({
-    prefix: options.commandPrefix || "!",
+    prefix: options.commandPrefix || '!',
     bot: botInterface,
   });
 
   botInterface.registerCommand = (
     command: string,
     handlerFunction: CommandHandlerFunction,
-    options: any,
+    options: any
   ): boolean => {
     return ch.register(command, handlerFunction, options);
   };
 
   //Handle Incoming messages
   client.on(
-    "message",
+    'message',
     (
       channel: string,
       tags: tmi.ChatUserstate,
       message: string,
-      self: boolean,
+      self: boolean
     ) => {
       //ignore messages from itself (the bot)
-      if (self) return;
+      if (self) {
+        return;
+      }
 
       ch.processCommand(client, channel, message, tags);
-    },
+    }
   );
 
   return botInterface;
