@@ -30,7 +30,7 @@ const settings = {
     //   (i.e., error, fatal, but not other levels)
     //
     new winston.transports.File({
-      filename: 'error.log',
+      filename: 'logs/error.log',
       level: 'error',
     }),
     //
@@ -38,7 +38,7 @@ const settings = {
     //   (i.e., fatal, error, warn, and info, but not trace)
     //
     new winston.transports.File({
-      filename: 'combined.log',
+      filename: 'logs/combined.log',
       level: 'info',
     }),
   ],
