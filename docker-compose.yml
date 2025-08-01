@@ -7,9 +7,8 @@ services:
     working_dir: /app
     environment:
       - NODE_ENV=production
-      - BOT_USERNAME=${BOT_USERNAME}
-      - OAUTH_TOKEN=${OAUTH_TOKEN}
-      - CHANNELS=${CHANNELS}
+      - USERNAME=${USERNAME}
+      - ACCESS_CODE=${ACCESS_CODE}
     restart: unless-stopped
     networks:
       public_net:
