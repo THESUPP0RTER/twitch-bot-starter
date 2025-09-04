@@ -28,11 +28,13 @@ services:
     container_name: twitch-bot-logs
     ports:
       - '8082:8080'
+    restart: unless-stopped
     volumes:
       - logs_data:/usr/share/nginx/html/logs:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
-      - public_net
+      public_net: 
+        ipv4_address: 172.18.1.4
     depends_on:
       - twitch-bot
 
@@ -83,6 +85,7 @@ networks:
         - subnet: 172.18.1.0/24
           gateway: 172.18.1.1
   nats_net:
+    name: nats_net
     driver: bridge
     ipam:
       config:
