@@ -19,10 +19,11 @@ async function bootstrap() {
     });
 
     await bot.connect();
-    logger.info('bot successfully made');
+    logger.info('Bot successfully made');
 
-    const nc = await connect();
-    logger.info('Connected to NATS');
+    const natsSocket = process.env.NATS_SOCKET || 'nats://localhost:4222';
+    const natsServers = [{ servers: [natsSocket] }];
+    const nc = await connect(natsServers[0]);
 
     const sc = StringCodec();
     const subject = 'twitch.messages';
